@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>REDES ADMINISTRADAS | RED UNO</title>
+	<link rel="icon" type="image/x-icon" href="../images/favicon.ico" />
+	<!-- Tell the browser to be responsive to screen width -->
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">	
+	<!-- Bootstrap 3.3.4 -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<!-- Font Awesome Icons -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+	<!-- DATA TABLES -->
+	<link href="../plugins/datatables/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+	<!-- Ionicons -->
+	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+	<!-- Select2 -->
+	<link href="../plugins/select2/select2.min.css" rel="stylesheet" type="text/css" />
+	<!-- Theme style -->
+	<link href="../dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+	<!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
+	<link href="../dist/css/skins/_all-skins.min.css" rel="stylesheet" type="text/css" />
+	<!-- jQuery Loadmask -->
+	<link href="../js/jquery-loadmask-0.4/jquery.loadmask.css" rel="stylesheet" type="text/css">
+	<!-- jQuery Chosen -->
+	<link rel="stylesheet" type="text/css" href="../plugins/chosen/chosen.min.css">
+	<!-- Date Picker -->
+	<link rel="stylesheet" type="text/css" href="../plugins/daterangepicker/daterangepicker-bs3.css">
+	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- Page-Level Styles -->
+	<style type="text/css">
+		.container { width: auto; }
+	</style>
+
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="skin-blue layout-top-nav">
+	<div class="wrapper">
+
+		<header class="main-header">
+			<nav class="navbar navbar-static-top">
+				<div class="container">
+					<div class="navbar-header">
+						<a href="../index2.html" class="navbar-brand"><b>Dashboard</b></a>
+						<button type="button" class="navbar-toggle collapsed" 
+							data-toggle="collapse" data-target="#navbar-collapse">
+							<i class="fa fa-bars"></i>
+						</button>
+					</div>
+
+					<!-- /.navbar-collapse -->
+					<!-- Navbar Right Menu -->
+					<div class="navbar-custom-menu">
+						<ul class="nav navbar-nav">
+							<li class="dropdown" id="userNameContainer"><a
+								class="dropdown-toggle" data-toggle="dropdown" href="#"> <i
+									class="fa fa-user fa-fw"></i> <span id="userName"></span> <i
+									class="fa fa-caret-down"></i>
+							</a>
+								<ul class="dropdown-menu dropdown-user">
+									<li><a id="logout"><i class="fa fa-sign-out fa-fw"></i>
+											Logout</a></li>
+								</ul> <!-- /.dropdown-user --></li>
+							<!-- /.dropdown -->
+						</ul>
+					</div>
+					<!-- /.navbar-custom-menu -->
+				</div>
+				<!-- /.container-fluid -->
+			</nav>
+		</header>
+		<!-- Full Width Column -->
+		<div class="content-wrapper">
+			<div class="container">
+				<!-- Content Header (Page header) -->
+				<section class="content-header">
+					<h1>
+						Redes Administradas
+					</h1>
+					<ol class="breadcrumb">
+						<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+						<li><a href="#" class="active">Incidents</a></li>
+					</ol>
+				</section>
+
+				<!-- Main content -->
+				<section class="content">
+					<div class="row">
+						<div class="col-md-2">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Lista Sectores</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="listSector">
+										
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						</div>
+						<div class="col-md-2">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Lista Proveedores</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="listProvider"></div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						</div>
+						<div class="col-md-2">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Lista Clientes</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="listCustomer">
+										
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						</div>	
+						<div class="col-md-4">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Rango de Fecha</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="col-md-6">
+										<div class="box box-primary">
+											<div class="box-header with-border">
+												<h3 class="box-title">De:</h3>
+												<div class="box-tools pull-right">
+													<div class="has-feedback">
+											       		<input type="text" class="form-control" name="dateFrom" id="dateFrom" placeholder="De ...">
+											        	<span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+											      	</div>	
+												</div>
+											</div>
+										</div>
+										<!-- /.box -->
+									</div>
+									<div class="col-md-6">
+										<div class="box box-primary">
+											<div class="box-header with-border">
+												<h3 class="box-title">A:</h3>
+												<div class="box-tools pull-right">
+													<div class="has-feedback">
+											       		<input type="text" class="form-control" name="dateTo" id="dateTo" placeholder="A ...">
+											        	<span class="glyphicon glyphicon-calendar form-control-feedback"></span>
+											      	</div>	
+												</div>
+											</div>
+										</div>
+										<!-- /.box -->
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Consultar</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<p><a href="#" class="btn btn-primary send" id="send" role="button">Enviar...</a></p>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						</div>						
+					</div>
+					<!-- /.row -->
+					<div class="row">
+						<div class="col-md-6">
+							<!-- AREA CHART -->
+							<div class="box box-primary" id="incidentsContainer">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Informaci&oacute;n De Servicios Administrados Inventario General</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="invGralChart">
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+
+						</div>
+						<!-- /.col (LEFT) -->
+
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Informaci&oacute;n De Servicios Administrados Tipo de Servicio</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<!-- /.box-header -->
+								<div class="box-body">
+									<div id="tipoServicioChart">
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						
+						</div>
+						<!-- /.col (RIGHT) -->
+					</div><!-- /.row -->
+					<div class="row">
+						<div class="col-md-6">
+							<!-- AREA CHART -->
+							<div class="box box-primary" id="incidentsContainer">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Cantidad de Fallas por Tiempo de Soluci&oacute;n </h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="fallaTiempoSolucion">
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+
+						</div>
+						<!-- /.col (LEFT) -->
+
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">Cumplimiento de SLA</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<!-- /.box-header -->
+								<div class="box-body">
+									<div id="cumplimientoSla">										
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						
+						</div>
+						<!-- /.col (RIGHT) -->
+					</div>
+					<!-- /.row -->
+					<div class="row">
+						<div class="col-md-6">
+							<!-- AREA CHART -->
+							<div class="box box-primary" id="incidentsContainer">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Fallas Por Tiempo de Soluci&oacute;n Divisionales Telmex</h3>									
+									<div class="box-tools pull-right">
+										<table>
+											<tr>
+												<td><div id="listDivisional"></div></td>
+												<td>
+													<button class="btn btn-box-tool" data-widget="collapse">
+														<i class="fa fa-minus"></i>
+													</button>
+												</td>
+											</tr>
+										</table>											
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="fallaTiempoSolucionTelmex">
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+
+						</div>
+						<!-- /.col (LEFT) -->
+
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Fallas Por Tiempo de Soluci&oacute;n Comparativo Divisionales Telmex</h3>
+									<div class="box-tools pull-right">
+										<table>
+											<tr>
+												<td>
+													<div>
+														<select id='tiempoSolComp' data-placeholder='' style='width:100%' tabindex='1'>
+															<option value='1'>Menor 3.6 hrs</option>
+															<option value='2'>Entre 3.6 y 7.2 hrs</option>
+															<option value='3'>Mayor 7.2 hrs</option>
+														</select>
+													</div>
+												</td>
+												<td>
+													<button class="btn btn-box-tool" data-widget="collapse">
+														<i class="fa fa-minus"></i>
+													</button>
+												</td>
+											</tr>
+										</table>
+										<!-- <button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>-->
+									</div>
+								</div>
+								<!-- /.box-header -->
+								<div class="box-body">
+									<div id="fallaTiempoSolucionTelmexComparativo"></div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						
+						</div>
+						<!-- /.col (RIGHT) -->
+					</div>
+					<!-- /.row -->
+					<div class="row">
+						<div class="col-md-6">
+							<!-- AREA CHART -->
+							<div class="box box-primary" id="incidentsContainer">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Comparativo Volumen De Fallas Divisionales Telmex</h3>
+									<div class="box-tools pull-right">										
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div id="indiceFallasWan">
+									</div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+
+						</div>
+						<!-- /.col (LEFT) -->
+
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title" style="text-align: center;">Cumplimiento de SLA por Regi&oacute;n</h3>
+									<div class="box-tools pull-right">
+										<button class="btn btn-box-tool" data-widget="collapse">
+											<i class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<!-- /.box-header -->
+								<div class="box-body">
+									<div id="slaRegion"></div>
+								</div>
+								<!-- /.box-body -->
+							</div>
+							<!-- /.box -->
+						
+						</div>
+						<!-- /.col (RIGHT) -->
+					</div>
+
+				</section>
+				<!-- /.content -->
+			</div>
+			<!-- /.container -->
+		</div>
+		<!-- /.content-wrapper -->
+		<footer class="main-footer"> </footer>
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- jQuery 2.1.4 -->
+	<script src="../plugins/jQuery/jQuery-2.1.4.min.js" type="text/javascript"></script>
+	<!-- Bootstrap 3.3.2 JS -->
+	<script src="../bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+	<!-- SlimScroll -->
+	<script src="../plugins/slimScroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+	<!-- FastClick -->
+	<script src="../plugins/fastclick/fastclick.min.js" type="text/javascript"></script>
+	<!-- AdminLTE App -->
+	<script src="../dist/js/app.min.js" type="text/javascript"></script>
+	<!-- Select2 -->
+	<script src="../plugins/select2/select2.full.min.js" type="text/javascript"></script>
+	<!-- Highcharts -->
+	<script src="../plugins/highcharts/highcharts.js"></script>
+	<script src="../plugins/highcharts/exporting.js"></script>
+	<!-- DATA TABES SCRIPT -->
+	<script src="../plugins/datatables/jquery.dataTables.min.js" type="text/javascript"></script>
+	<script src="../plugins/datatables/dataTables.bootstrap.min.js" type="text/javascript"></script>
+	<!-- jQuery Loadmask -->
+	<script src="../js/jquery-loadmask-0.4/jquery.loadmask.min.js"></script>
+	<!-- CHOSEN -->
+	<script src="../plugins/chosen/chosen.jquery.min.js" type="text/javascript"></script>
+	<!-- Endpoint Properties -->
+	<script src="../js/cnoc/endpoint.js"></script>
+	<!-- CNOC Framework -->
+	<script src="../js/cnoc/cnocFramework.js"></script>
+	<!-- Main Dashboard RA's -->
+	<script src="../js/cnoc/drawElementsMain.js"></script>
+	<!-- Navigation Bar -->
+	<script src="../js/cnoc/navigation.js"></script>
+	<!-- Date Picker -->
+	<script src="../plugins/daterangepicker/moment.js"></script>
+	<script src="../plugins/daterangepicker/daterangepicker.js"></script>
+		
+	<!-- Page-Level Scripts -->
+	<script>
+	    $(document).ready(function() {
+
+	    	
+	    	$('#dateFrom').daterangepicker({
+	            singleDatePicker: true,
+	            showDropdowns: true,
+                format: 'YYYY-MM'
+
+	        });
+	    	
+	    	$('#dateTo').daterangepicker({
+	            singleDatePicker: true,
+	            showDropdowns: true,
+	            format: 'YYYY-MM'
+	        });
+	    	
+	    	/*** Load Enpoints services ***/
+	    	endpoint.getproperties();
+	    	
+	    	/*** Load Navigation Bar & Init function***/
+	    	navigation.loadUser();
+	    	
+	    	/*** Add listeners ***/
+	    	drawElementsMain.init();
+	    	$('#send').on("click", function(){
+	    		drawElementsMain.main();
+	    	});
+	        
+	        /*** Load footer ***/
+	        $( ".main-footer" ).load( "footer.html" );
+	        
+	        $('#example2').DataTable();	        
+	        
+	    });
+    </script>
+
+</body>
+</html>

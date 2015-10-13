@@ -1,0 +1,17 @@
+{
+
+"main" : "http://dashboard-ra.cnoc.telmexit.com:8081",
+
+"logout":"/presto/edge/api/rest/UserManagerService/logout",
+"getCurrentUser":"/presto/edge/api/rest/ms_getCurrentUser/Invoke?x-presto-resultFormat=json",
+"getFilters" : "/presto/edge/api/rest/ms_filters/Invoke?x-presto-resultFormat=json",
+"getInvGeneralSA" : "/presto/edge/api/rest/ms_inventario/Invoke?x-presto-resultFormat=json",
+"getTipoServicio" : "/presto/edge/api/rest/ms_tipo_servicio/Invoke?x-presto-resultFormat=json",
+"getCumplimientoSLA" : "/presto/edge/api/rest/ms_cumplimiento_sla/Invoke?x-presto-resultFormat=json",
+"getFallaTiempoSolucion" : "/presto/edge/api/rest/ms_falla_tiempo_solucion/Invoke?x-presto-resultFormat=json",
+"getFallaTiempoSolucionTelmex" : "/presto/edge/api/rest/ms_falla_tiempo_solucion_telmex/Invoke?x-presto-resultFormat=json",
+"getIndiceFallaWan":"/presto/edge/api/rest/ms_indice_falla_wan/Invoke?x-presto-resultFormat=json",
+"getCumplimientoSlaRegion" : "/presto/edge/api/rest/ms_cumplimiento_sla_region/Invoke?x-presto-resultFormat=json",
+"getFallaDivisionales" : "/presto/edge/api/rest/ms_fallas_divisionales/Invoke?x-presto-resultFormat=json"
+
+}
