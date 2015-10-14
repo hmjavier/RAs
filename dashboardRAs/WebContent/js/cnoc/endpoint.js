@@ -10,6 +10,7 @@ var endpoint = {
 		    url: "../properties/endpoint.json",
 		    success: function( data ) {
 		    	endpoint.main = data.main;
+		    	endpoint.path = data.path;
 				endpoint.logout = endpoint.main + data.logout;
 				endpoint.getCurrentUser = endpoint.main + data.getCurrentUser;				
 				endpoint.getFilters = endpoint.main + data.getFilters;

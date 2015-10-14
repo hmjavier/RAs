@@ -53,16 +53,16 @@ var navigation = {
 		$( '#logout' ).click(function() {
 			$.ajax({
 				type: 'GET',
-				dataType: 'jsonp',
+				dataType: 'json',
 				url: endpoint.logout,
 				success: function(response) {	    				
-					window.location = endpoint.main;
+					window.location = endpoint.path;
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
 					console.log(jqXHR);
-					window.location = endpoint.main;
+					window.location = endpoint.path;
 				}
 			});
 		});
-	}	
+	}
 };

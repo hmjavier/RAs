@@ -1,6 +1,7 @@
 {
 
-"main" : "http://dashboard-ra.cnoc.telmexit.com:8081",
+"main" : "",
+"path":"/dashboardRAs",
 
 "logout":"/presto/edge/api/rest/UserManagerService/logout",
 "getCurrentUser":"/presto/edge/api/rest/ms_getCurrentUser/Invoke?x-presto-resultFormat=json",

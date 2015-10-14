@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<meta charset="utf-8">
+		<title>..:: Indicadores ::..</title>
+		<link rel="icon" href="./images/favicon.ico">
+		<link href="css/style.css" rel='stylesheet' type='text/css' />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script type="text/javascript" src="../presto/hub/jsapi/loader.js"></script>
+		<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+		<script>
+			Presto.loadLib("presto-core", null, true);
+			Presto.loadLib("presto-util", null, true);
+		</script>
+		<script>
+			( function( $ ) {
+			
+				/************ Set config variables ************/
+				var loc = window.location.search.toString(),
+				returnUrl = loc.slice(loc.indexOf("return_url=") + 11),
+				appName = "Presto",
+				connection = new Presto.Connection({
+					prestoUrl: '/presto'
+					//prestoUrl: 'http://dashboarddev.cnoc.telmexit.com:8080/presto'
+				}),
+				cp = new Presto.Util.CookieProvider({
+					expiry: Presto.REMEMBERMEDAYS * 24 * 60 * 60 * 1000
+				}),
+				savedUsername = cp.get("PrestoUsername");
+					        
+								
+				if (!returnUrl || returnUrl === '') {
+					returnUrl = "pages/index.html";
+				}
+	    	
+				if ( window.location.hash.length ) {
+					returnUrl += window.location.hash;
+				}
+			
+				$(document).ready(function() {
+					Presto.REMEMBERMEDAYS = 7;
+					Presto.Gfx.PNGfixImg();
+	            
+					// check if user is authenticated
+					checkIfAuthenticated();					
+	
+					/**
+					 * Login form handler
+					 */
+					$(".main").find("form").submit(function(e) {						
+						e.preventDefault();
+						var self = $(this),
+						username = self.find("input[name=username]").val(),
+						password = self.find("input[name=password]").val();
+	
+						login(username, password);						
+					});
+				
+				});// termina on ready				
+	        
+				// Check if User is already authenticated or not
+				// If not, show login box. Else redirect to Home Page.
+				var checkIfAuthenticated = function() {					
+					connection.isAuthenticated(function(response) {
+						if (response) {							
+							window.location.href = decodeURIComponent(returnUrl);
+						}
+					});
+				};
+				
+				// Authenticate the User.
+                // After successful auth, redirect to respective page (ie. Hub / Appstore)
+                var login = function(username, password) {
+
+					connection.login(username, password, {
+	                	onSuccess: function(){
+	                	    cp.set("PrestoUsername", username);
+	                	    
+	                	    window.location.href = decodeURIComponent(returnUrl);
+	                    	
+	                    },
+	                    onFailure: function(e){
+	                    	var msg = (e && e.message);
+							if (!msg) {
+                                msg = "Incorrect username and/or password";
+                            }
+							
+							alert(msg);
+                        },
+                        scope: this
+	                });//end connection.login
+    	                
+                }; // end login
+	        
+				
+			})(jQuery);
+		</script>
+		<!--webfonts-->
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text.css'/>
+		<!--//webfonts-->
+</head>
+ 
+<body>
+	<div class="main">
+		<form>
+    		<h1 style="background:#ffffff;"><img src="./images/Logo-Telmex-IT.jpg" ></h1>
+  			<div class="inset">
+	  			<p>
+	    		 <label for="email">USERNAME</label>
+   	 			<input type="text" placeholder="username" name="username" autofocus required/>
+				</p>
+  				<p>
+				    <label for="password">PASSWORD</label>
+				    <input type="password" placeholder="password" name="password" required/>
+  				</p>				  
+ 			 </div> 	 
+			  <p class="p-container">			    
+			    <input type="submit" value="Login">
+			  </p>
+		</form>
+	</div>  
+			<!-----start-copyright---->
+   				<div class="copy-right">   					
+   					<p>Insurgentes Sur # 3500, Torre Telmex Cuicuilco, Col. Peña Pobre<br>					
+					Delegación Tlalpan, CP 14060; México, D.F.<br>					
+					© 2015 TELMEX. Todos los derechos reservados.</p>
+				</div>
+			<!-----//end-copyright---->
+</body>
+</html>
