@@ -22,6 +22,9 @@ var endpoint = {
 				endpoint.getIndiceFallaWan = endpoint.main + data.getIndiceFallaWan;
 				endpoint.getCumplimientoSlaRegion = endpoint.main + data.getCumplimientoSlaRegion;
 				endpoint.getFallaDivisionalesComparativo = endpoint.main + data.getFallaDivisionales;
+				
+				endpoint.getInvGeneralGlobalSA = endpoint.main + data.getInvGeneralGlobalSA;
+				endpoint.getFallasPie = endpoint.main + data.getFallasPie;
 			}
 		});
 	}

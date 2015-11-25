@@ -485,15 +485,15 @@
 	    	
 	    	/*** Add listeners ***/
 	    	drawElementsMain.init();
+	    	
 	    	$('#send').on("click", function(){
+	    		alert("enviando");
 	    		drawElementsMain.main();
 	    	});
 	        
 	        /*** Load footer ***/
 	        $( ".main-footer" ).load( "footer.html" );
-	        
-	        $('#example2').DataTable();	        
-	        
+
 	    });
     </script>
 

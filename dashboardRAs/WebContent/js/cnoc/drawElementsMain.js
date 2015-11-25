@@ -4,7 +4,7 @@
  * Version: 1.0
  */
 
-var drawElementsMain = {
+var drawElementsMain2 = {
 		
 	/**
 	 * Init function 
@@ -23,6 +23,16 @@ var drawElementsMain = {
 			drawElementsMain.createSeriesComparativo(drawElementsMain.dataSeriesComparativo, flag, "#fallaTiempoSolucionTelmexComparativo");
 		});
 		
+		var dateTmp = ((new Date().getTime() / 1000 | 0)-(365 * 24 * 3600));
+		var dateFrom = new Date(dateTmp * 1000).getFullYear()+"-"+(new Date(dateTmp * 1000).getMonth()+1)+"-01";
+		var dateTo = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-01";
+		
+		drawElementsMain.getDataGlobal(dateFrom, dateTo);
+		
+	}, getDataGlobal: function(dateFrom, dateTo){
+		
+		drawElementsMain.getInventarioGeneral(dateFrom, dateTo, null, null, null, "global");
+		
 	},main: function(){
 		
 		var dateFrom = $('#dateFrom').val()+"-01";
@@ -32,7 +42,7 @@ var drawElementsMain = {
 		var customer = $("#listCustomerG option:selected").val();
 		
 		
-		drawElementsMain.getInventarioGeneral(dateFrom, dateTo, sector, provider, customer);
+		drawElementsMain.getInventarioGeneral(dateFrom, dateTo, sector, provider, customer, null);
 		drawElementsMain.getTipoDeSitio(dateFrom, dateTo, sector, provider, customer);
 		drawElementsMain.getCumplimientoSla(dateFrom, dateTo, provider);
 		drawElementsMain.getFallaTiempoSolucion(sector, dateFrom, dateTo);
@@ -135,14 +145,14 @@ var drawElementsMain = {
 	 * @param : provider
 	 * @param : customer
 	 */
-	, getInventarioGeneral: function(dateFrom, dateTo, sector, provider, customer){
+	, getInventarioGeneral: function(dateFrom, dateTo, sector, provider, customer, flag){
 		
 		
 		$("#invGralChart").empty();
 
 		cnocFramework.invokeMashup({
 			invokeUrl : endpoint.getInvGeneralSA,
-			params : {"idSector" : sector, "idProveedor": provider, "mesInicio": dateFrom, "mesFin":dateTo, "idCliente":customer},
+			params : {"idSector" : sector, "idProveedor": provider, "mesInicio": dateFrom, "mesFin":dateTo, "idCliente":customer, "flag": flag},
 			callback : function(response, divContainers, divElements) {
 				
 				var dataDispositivos = [];
@@ -248,6 +258,7 @@ var drawElementsMain = {
 	 * @param : customer
 	 */
 	, getCumplimientoSla: function(dateFrom, dateTo, provider){
+		console.log("Estoy en el 1");
 		$("#cumplimientoSla").empty();
 
 		cnocFramework.invokeMashup({

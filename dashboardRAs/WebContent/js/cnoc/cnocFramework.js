@@ -34,7 +34,7 @@ var cnocFramework = {
 						var ce = response.PrestoResponse.PrestoError.ErrorDetails.code;
 						if (ce == 401) {
 							alert("Insuficientes Prvilegios");
-							window.location = endpoint.main;
+							window.location = endpoint.path;
 						}
 					} catch (err) {
 						/*** Invoke function callback ***/
@@ -48,16 +48,17 @@ var cnocFramework = {
 				error : function(jqXHR, textStatus, errorThrown) {
 					console.log(jqXHR);
 					console.log(textStatus);
-					console.log(errorThrown);										
+					console.log(errorThrown);
+					window.location = endpoint.path;
 				},
 				statusCode: {
 					404: function() {
 						alert("Insuficientes Prvilegios");
-						window.location = endpoint.main;
+						window.location = endpoint.path;
 					},
 					401: function() {
 						alert("Insuficientes Prvilegios");
-						window.location = endpoint.main;
+						window.location = endpoint.path;
 					}
 				}
 			});
@@ -159,7 +160,7 @@ var cnocFramework = {
 	        yAxis: {
 	            min: 0,
 	            title: {
-	                text: ""
+	                text: "Porcentaje"
 	            }
 	        },
 	        tooltip: {
@@ -274,5 +275,156 @@ var cnocFramework = {
 	        },
 	        series: series
 		});  
+	},
+	/*
+	 * createColumnChartGlobal
+	 * @param : container
+	 * @param : series
+	 * @param : categories
+	 * @param : title
+	 * @param : subtitle
+	 */
+	createColumnChartGlobal: function(container, series, categories, title, subtitle){		
+		$(container).highcharts({
+	        chart: {
+	        	type: 'column',
+                zoomType: 'xy'
+	        },credits: {
+                enabled: false
+            },
+	        title: {
+	            text: title,
+	            useHTML : true,
+	            style: {
+	            	fontSize : "15px",
+	            	fontWeight: "bold"
+	            }
+	        },
+	        subtitle: {
+	            text: subtitle
+	        },
+	        xAxis: {
+	            categories: categories
+	        },
+	        yAxis: {
+	            title: {
+	                text: ""
+	            }
+	        },tooltip: {
+                crosshairs: true,
+                shared: true
+            },plotOptions: {
+	            series: {
+	                cursor: 'pointer',
+	                point: {
+	                    events: {
+	                        click: function () {
+	                        	if(container === "#invGralChartProveedor"){
+	                        		//console.log(this.category);
+	                        		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, "AND p.nombre = '"+this.category+"'");
+	                        	}	                        	
+	                        }
+	                    }
+	                }
+	            }
+	        },
+	        series: series
+	    });		
+	},createTwoAxis: function(container, series, categories, title, subtitle){
+		 $(container).highcharts({
+		        chart: {
+		            type: 'column'
+		        },
+		        title: {
+		            text: title
+		        },
+		        xAxis: {
+		            categories: categories
+		        },
+		        yAxis: [{
+		            min: 0,
+		            title: {
+		                text: 'Dentro de SLA'
+		            }
+		        }, {
+		            title: {
+		                text: 'Fuera de SLA'
+		            },
+		            opposite: true
+		        }],
+		        legend: {
+		            shadow: false
+		        },
+		        tooltip: {
+		            shared: true
+		        },
+		        plotOptions: {
+		            column: {
+		                grouping: false,
+		                shadow: false,
+		                borderWidth: 0
+		            }
+		        },
+		        series: series
+		    });
+	},createPieChart:function(container, series, categories, title, subtitle){
+		console.log(container);
+		$(container).highcharts({
+	        chart: {
+	            plotBackgroundColor: null,
+	            plotBorderWidth: null,
+	            plotShadow: false,
+	            type: 'pie'
+	        },
+	        title: {
+	            text: title +" "+subtitle
+	        },
+	        tooltip: {
+	            pointFormat: 'Fallas: <b>{point.y}</b>'
+	        },
+	        plotOptions: {
+	            pie: {
+	                allowPointSelect: true,
+	                cursor: 'pointer',
+	                dataLabels: {
+	                    enabled: true,
+	                    format: '<b>{point.name}</b>: {point.percentage:.1f} % ',
+	                    style: {
+	                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+	                    }
+	                }
+	            }
+	        },
+	        series:  [{
+	            name: 'Fallas',
+	            colorByPoint: true,
+	            data: series
+	        }]
+	        /*series: [{
+	            name: 'Brands',
+	            colorByPoint: true,
+	            data: [{
+	                name: 'Microsoft Internet Explorer',
+	                y: 56.33
+	            }, {
+	                name: 'Chrome',
+	                y: 24.03,
+	                sliced: true,
+	                selected: true
+	            }, {
+	                name: 'Firefox',
+	                y: 10.38
+	            }, {
+	                name: 'Safari',
+	                y: 4.77
+	            }, {
+	                name: 'Opera',
+	                y: 0.91
+	            }, {
+	                name: 'Proprietary or Undetectable',
+	                y: 0.2
+	            }]
+	        }]*/
+	    });
 	}	
 };
