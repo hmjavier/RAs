@@ -1,16 +1,19 @@
 /**
- * Title: Main Script
+ * Title: Main Script Dashboard RA's
  * Autor: hmjavier
  * Version: 1.0
  */
 
-var drawElementsMain2 = {
+var drawElementsMain = {
 		
 	/**
 	 * Init function 
 	 */
+	dateFrom: null,
+	dateTo: null, 
 	dataSeriesComparativo : [],	
 	init : function () {
+		
 		drawElementsMain.getFilter('#listSector', '#listSectorG', 'Sector', null, null);
 		drawElementsMain.getFilter('#listProvider', '#listProviderG', 'Proveedor', null, null);
 		drawElementsMain.getFilter('#listCustomer', '#listCustomerG', 'Cliente', 1, 1);
@@ -24,33 +27,114 @@ var drawElementsMain2 = {
 		});
 		
 		var dateTmp = ((new Date().getTime() / 1000 | 0)-(365 * 24 * 3600));
-		var dateFrom = new Date(dateTmp * 1000).getFullYear()+"-"+(new Date(dateTmp * 1000).getMonth()+1)+"-01";
-		var dateTo = new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-01";
+		drawElementsMain.dateFrom = new Date(dateTmp * 1000).getFullYear()+"-"+(new Date(dateTmp * 1000).getMonth()+1)+"-01";
+		drawElementsMain.dateTo = new Date().getFullYear()+"-"+(new Date().getMonth()-1)+"-01";
 		
-		drawElementsMain.getDataGlobal(dateFrom, dateTo);
+		drawElementsMain.getDataGlobal();
 		
-	}, getDataGlobal: function(dateFrom, dateTo){
 		
-		drawElementsMain.getInventarioGeneral(dateFrom, dateTo, null, null, null, "global");
+		drawElementsMain.getGlobalByDivisional("#invGralChartDivisionalG","#invGralChartDivisional", "divisional", "Inventario General", "Por Divisional");
+		drawElementsMain.getGlobalByDivisional("#invGralChartSectorG","#invGralChartSector", "sector", "Inventario General", "Por Sector");
+		drawElementsMain.getGlobalByDivisional("#invGralChartProveedorG","#invGralChartProveedor", "proveedor", "Inventario General", "Por Proveedor");
+		drawElementsMain.getFallaPie("#fallaResponsableG","#fallaResponsable",  "Fallas ", "Por Responsable: Global","", "");
 		
+		
+	}, getDataGlobal: function(){
+		
+		//drawElementsMain.getInventarioGeneral(drawElementsMain.dateFrom, drawElementsMain.dateTo, null, null, null, "global");
+		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, null);
+		drawElementsMain.getFallaTiempoSolucionTelmex(null, null,drawElementsMain.dateFrom, drawElementsMain.dateTo);
+
 	},main: function(){
 		
-		var dateFrom = $('#dateFrom').val()+"-01";
-		var dateTo = $('#dateTo').val()+"-01";
+		if($('#dateTo').val() !== ''){
+			drawElementsMain.dateFrom = $('#dateFrom').val()+"-01";
+			drawElementsMain.dateTo = $('#dateTo').val()+"-01";
+		}
+
 		var sector = $("#listSectorG option:selected").val();
 		var provider = $("#listProviderG option:selected").val();
 		var customer = $("#listCustomerG option:selected").val();
 		
+		var texto = null;
 		
-		drawElementsMain.getInventarioGeneral(dateFrom, dateTo, sector, provider, customer, null);
-		drawElementsMain.getTipoDeSitio(dateFrom, dateTo, sector, provider, customer);
-		drawElementsMain.getCumplimientoSla(dateFrom, dateTo, provider);
-		drawElementsMain.getFallaTiempoSolucion(sector, dateFrom, dateTo);
-		drawElementsMain.getFallaTiempoSolucionTelmex(sector, 1, dateFrom, dateTo);
-		drawElementsMain.getIndiceFallaWan(dateFrom, dateTo, provider, sector);
-		drawElementsMain.getSlaRegion(dateFrom, dateTo);
-		drawElementsMain.getFallaTiempoSolucionTelmexComparativo(dateFrom, dateTo);
+		if(customer === '' && sector !==''){
+			texto =  $("#listSectorG option:selected").text();
+		}else if(customer !== ''){
+			texto =  $("#listSectorG option:selected").text()+" - "+$("#listCustomerG option:selected").text();
+		}
 		
+		drawElementsMain.getInventarioGeneral(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer, null);
+		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, "AND p.idProveedor = "+provider);
+		drawElementsMain.getTipoDeSitio(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer);		
+		drawElementsMain.getFallaTiempoSolucion(sector, drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		drawElementsMain.getFallaTiempoSolucionTelmex("AND s.idSector = "+sector, null, drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		drawElementsMain.getIndiceFallaWan(drawElementsMain.dateFrom, drawElementsMain.dateTo, provider, sector);		
+		drawElementsMain.getFallaTiempoSolucionTelmexComparativo(drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		
+		drawElementsMain.getFallaPie("#fallaResponsableG","#fallaResponsable",  "Fallas ", "Por Responsable: "+texto, sector, customer);
+		
+	},getFallaPie:function(divContainer, divElement, title, subtitle, sector, cliente){
+		
+		$(divElement).empty();
+		
+		cnocFramework.invokeMashup({
+			invokeUrl : endpoint.getFallasPie,
+			params : {"mes":drawElementsMain.dateTo, "sector":sector, "cliente":cliente},
+			callback : function(response, divContainers, divElements) {
+				
+				console.log(response);
+				
+				var series = [];
+			
+				series.push({name:"ADSL", y:parseInt(response.records.record.adsl)});
+				series.push({name:"CLIENTE", y:parseInt(response.records.record.cliente)});
+				series.push({name:"ISDN", y:parseInt(response.records.record.isdn)});
+				series.push({name:"RED UNO", y:parseInt(response.records.record.red_uno)});
+				series.push({name:"SIN CLIENTE", y:parseInt(response.records.record.sin_cliente)});
+				series.push({name:"TELMEX", y:parseInt(response.records.record.telmex)});
+				series.push({name:"UNINET", y:parseInt(response.records.record.uninet)});
+				
+				cnocFramework.createPieChart(divElements[0].selector, series, null, title, subtitle);
+
+			},
+			divContainers : [ $(divContainer)],
+			divElements : [ $(divElement)]
+		});
+	},getGlobalByDivisional: function(divContainer, divElement, flag, title, subtitle){
+		
+		$(divElement).empty();
+
+		cnocFramework.invokeMashup({
+			invokeUrl : endpoint.getInvGeneralGlobalSA,
+			params : {"flag":flag},
+			callback : function(response, divContainers, divElements) {
+
+				var dataCategories = [];
+				var dataDispositivos = [];
+				var dataClientes = [];
+				var dataSitios = [];
+				var series = [];
+				
+				if(response.records.record.length > 1){
+					for(var i=0;  i < response.records.record.length; i++){
+						
+						dataCategories.push(response.records.record[i].nombre);
+						dataDispositivos.push( parseInt(response.records.record[i].dispositivos));
+						dataClientes.push( parseInt(response.records.record[i].clientes));
+						dataSitios.push( parseInt(response.records.record[i].sitios));
+					}
+				}
+				series.push({ name:"Dispositivos", data: dataDispositivos});
+				series.push({ name:"Clientes", data: dataClientes});
+				series.push({ name:"Sitios", data: dataSitios});
+				
+				cnocFramework.createColumnChartGlobal(divElements[0].selector, series, dataCategories, title, subtitle);
+				
+			},
+			divContainers : [ $(divContainer)],
+			divElements : [ $(divElement)]
+		});
 	}
 	/*
 	 * getFilter
@@ -68,21 +152,21 @@ var drawElementsMain2 = {
 			callback : function(response, divContainers, divElements) {				
 
 				$(divContainers[0].selector).empty();
-				$(divContainers[0].selector).append("<select id='"+divElements[0].selector.replace("#","")+"' data-placeholder='Selecciona "+filter+"' style='width:100%' tabindex='1'><option value='0'>Selecciona "+filter+"</option></select>");
+				$(divContainers[0].selector).append("<select id='"+divElements[0].selector.replace("#","")+"' data-placeholder='Selecciona "+filter+"' style='width:100%' tabindex='1'><option value=''>Selecciona "+filter+"</option></select>");
 				
 				try{
 					if (response.records.record.length > 1) {
 
 						for ( var i = 0; i < response.records.record.length; i++) {
 							jQuery(divElements[0].selector).append(
-									"<option rel='"+response.records.record[i].id.toString()+"' value='"
+									"<option name = '"+response.records.record[i].nombre.toString()+"' rel='"+response.records.record[i].id.toString()+"' value='"
 											+ response.records.record[i].id.toString() + "'>"
 											+ response.records.record[i].nombre.toString()
 											+ "</option>");
 						}
 					} else {
 						jQuery(divElements[0].selector).append(
-								"<option rel='"+response.records.record.id.toString()+"' value='"
+								"<option name = '"+response.records.record[i].nombre.toString()+"' rel='"+response.records.record.id.toString()+"' value='"
 										+ response.records.record.id.toString()
 										+ "'>" + response.records.record.nombre.toString()
 										+ "</option>");
@@ -100,11 +184,10 @@ var drawElementsMain2 = {
 						$(divElements[0].selector).chosen({
 							allow_single_deselect : true
 						}).change(function(){
-							var sector = $("#listSectorG option:selected").val();
+							//var sector = $("#listSectorG option:selected").val();
 							var divisional = $("#listDivisionalG option:selected").val();
-							var dateFrom = $('#dateFrom').val()+"-01";
-							var dateTo = $('#dateTo').val()+"-01";
-							drawElementsMain.getFallaTiempoSolucionTelmex(sector, divisional , dateFrom, dateTo);
+							console.log(drawElementsMain.dateFrom+ "-- "+drawElementsMain.dateTo);
+							drawElementsMain.getFallaTiempoSolucionTelmex(null, "AND s.idSector = "+divisional , drawElementsMain.dateFrom, drawElementsMain.dateTo);
 						});
 					}else{
 						$(divElements[0].selector).chosen({
@@ -249,16 +332,14 @@ var drawElementsMain2 = {
 			divContainers : [ $("#tipoServicioChartG")],
 			divElements : [ $("#tipoServicioChart")]
 		});
-	}/*
-	 * getInventarioGeneral
+	}
+	 /* getCumplimientoSla
 	 * @param : dateFrom
 	 * @param : dateTo
-	 * @param : sector
 	 * @param : provider
-	 * @param : customer
 	 */
 	, getCumplimientoSla: function(dateFrom, dateTo, provider){
-		console.log("Estoy en el 1");
+
 		$("#cumplimientoSla").empty();
 
 		cnocFramework.invokeMashup({
@@ -281,10 +362,10 @@ var drawElementsMain2 = {
 					}
 				}
 				
-				dataChart.push({ name:"Dentro de SLA", data: dentroSla});
-				dataChart.push({ name:"Fuera de SLA", data: fueraSla});
+				dataChart.push({ name:"Dentro de SLA", data: dentroSla, type: 'spline'});
+				dataChart.push({ name:"Fuera de SLA", data: fueraSla, yAxis: 1});
 				
-				cnocFramework.createBarChart(divElements[0].selector, dataChart, dataTime, null, null);
+				cnocFramework.createTwoAxis(divElements[0].selector, dataChart, dataTime, null, null);
 				
 			},
 			divContainers : [ $("#cumplimientoSlaG")],
@@ -311,9 +392,15 @@ var drawElementsMain2 = {
 				var dataChart = [];
 				
 				if(response.records.record.length > 1){
+					var mes = null;
 					for(var i=0;  i < response.records.record.length; i++){
 						
 						var idRango = parseInt(response.records.record[i].idrango);
+						
+						if(mes !== response.records.record[i].mes){
+							mes = response.records.record[i].mes;
+							dataTime.push(response.records.record[i].mes);
+						}
 						
 						if(idRango === 1){
 							minor3_6_hr.push( parseInt(response.records.record[i].column1));
@@ -321,10 +408,7 @@ var drawElementsMain2 = {
 							in_7_2hrs.push( parseInt(response.records.record[i].column1));
 						}else if(idRango === 3){
 							max7_2h_r.push( parseInt(response.records.record[i].column1));
-						}
-						
-						dataTime.push(response.records.record[i].mes);
-						
+						}						
 					}
 				}
 				
@@ -341,47 +425,7 @@ var drawElementsMain2 = {
 			divContainers : [ $("#fallaTiempoSolucionG")],
 			divElements : [ $("#fallaTiempoSolucion")]
 		});
-	},
-	/* getCumplimientoSla
-	 * @param : dateFrom
-	 * @param : dateTo
-	 * @param : provider
-	 */
-	getCumplimientoSla: function(dateFrom, dateTo, provider){
-		
-		$("#cumplimientoSla").empty();
-
-		cnocFramework.invokeMashup({
-			invokeUrl : endpoint.getCumplimientoSLA,
-			params : {"idProveedor": provider, "mesInicio": dateFrom, "mesFin":dateTo},
-			callback : function(response, divContainers, divElements) {
-
-				var dentroSla = [];
-				var fueraSla = [];
-				var dataTime = [];
-				var dataChart = [];
-				
-				if(response.records.record.length > 1){
-					for(var i=0;  i < response.records.record.length; i++){
-						
-						dentroSla.push( parseInt(response.records.record[i].dentro_sla));
-						fueraSla.push( parseInt(response.records.record[i].fuera_sla));
-						dataTime.push(response.records.record[i].mes);
-						
-					}
-				}
-				
-				dataChart.push({ name:"Dentro de SLA", data: dentroSla});
-				dataChart.push({ name:"Fuera de SLA", data: fueraSla});
-				
-				cnocFramework.createBarChart(divElements[0].selector, dataChart, dataTime, null, null);
-				
-			},
-			divContainers : [ $("#cumplimientoSlaG")],
-			divElements : [ $("#cumplimientoSla")]
-		});
-	}, 
-	 /* getFallaTiempoSolucionTelmex
+	}, /* getFallaTiempoSolucionTelmex
 	 * @param : dateFrom
 	 * @param : dateTo
 	 * @param : sector
@@ -403,9 +447,15 @@ var drawElementsMain2 = {
 				var dataChart = [];
 				
 				if(response.records.record.length > 1){
+					var mes = null;
 					for(var i=0;  i < response.records.record.length; i++){
 						
 						var idRango = parseInt(response.records.record[i].idrango);
+						
+						if(mes !== response.records.record[i].mes){
+							mes = response.records.record[i].mes;
+							dataTime.push(response.records.record[i].mes);
+						}
 						
 						if(idRango === 1){
 							minor3_6_hr.push( parseInt(response.records.record[i].column1));
@@ -414,11 +464,12 @@ var drawElementsMain2 = {
 						}else if(idRango === 3){
 							max7_2h_r.push( parseInt(response.records.record[i].column1));
 						}
-						
-						dataTime.push(response.records.record[i].mes);
-						
-					}
+					}					
 				}
+				
+				console.log("getFallaTiempoSolucionTelmex");
+				console.log(dataTime);
+				
 				dataChart.push({ name:"Menor a 3.6 HRS", data: minor3_6_hr});
 				dataChart.push({ name:"Entre 3.6 y 7.2 HRS", data: in_7_2hrs});
 				dataChart.push({ name:"Mayor a 7.2", data: max7_2h_r});
@@ -519,7 +570,7 @@ var drawElementsMain2 = {
 
 	},
 	
-	/* getCumplimientoSla
+	/* getIndiceFallaWan
 	 * @param : dateFrom
 	 * @param : dateTo
 	 * @param : provider
