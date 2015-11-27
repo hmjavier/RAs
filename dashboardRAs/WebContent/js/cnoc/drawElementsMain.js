@@ -13,7 +13,7 @@ var drawElementsMain = {
 	dateTo: null, 
 	dataSeriesComparativo : [],	
 	init : function () {
-		
+
 		drawElementsMain.getFilter('#listSector', '#listSectorG', 'Sector', null, null);
 		drawElementsMain.getFilter('#listProvider', '#listProviderG', 'Proveedor', null, null);
 		drawElementsMain.getFilter('#listCustomer', '#listCustomerG', 'Cliente', 1, 1);
@@ -39,11 +39,29 @@ var drawElementsMain = {
 		drawElementsMain.getFallaPie("#fallaResponsableG","#fallaResponsable",  "Fallas ", "Por Responsable: Global","", "");
 		
 		
+		/*var now = new Date();
+		//var monthAbbrvName = now.toDateString().substring(4, 7);
+		var monthAbbrvName = now.toString();
+		console.log(monthAbbrvName);*/
+		
+		Date.prototype.getMonthName = function() {
+	          var monthNames = [ "enero", "febrero", "marzo", "abril", "mayo", "junio", 
+	                        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" ];
+	          return monthNames[this.getMonth()-1];
+	     };
+
+	      var month_Name =  new Date().getMonthName();
+
+		$("#titleGlobal").html("Informaci&oacute;n De Servicios Administrados Inventario General: "+new Date().getFullYear()+"-"+month_Name);
+		
+		
 	}, getDataGlobal: function(){
 		
 		//drawElementsMain.getInventarioGeneral(drawElementsMain.dateFrom, drawElementsMain.dateTo, null, null, null, "global");
-		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, null);
+		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, null, null,null);
+		drawElementsMain.getFallaTiempoSolucion(drawElementsMain.dateFrom, drawElementsMain.dateTo, null, null,null);
 		drawElementsMain.getFallaTiempoSolucionTelmex(null, null,drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		drawElementsMain.getFallaTiempoSolucionTelmexComparativo(drawElementsMain.dateFrom, drawElementsMain.dateTo);
 
 	},main: function(){
 		
@@ -57,21 +75,43 @@ var drawElementsMain = {
 		var customer = $("#listCustomerG option:selected").val();
 		
 		var texto = null;
+		var sectorFilter = null;
+		var providerFilter = null;
+		var customerFilter = null;
 		
-		if(customer === '' && sector !==''){
+		if(customer === '' && provider === ''){
+			console.log("entro 1");
 			texto =  $("#listSectorG option:selected").text();
-		}else if(customer !== ''){
-			texto =  $("#listSectorG option:selected").text()+" - "+$("#listCustomerG option:selected").text();
+			sectorFilter = " AND s.idSector = "+sector;
+		}else if(sector !== ''  && provider !== '' && customer === ''){
+			console.log("entro 2");
+			texto =  $("#listSectorG option:selected").text()+" - "+$("#listProviderG option:selected").text();
+			sectorFilter = " AND s.idSector = "+sector;
+			providerFilter =  " AND p.idProveedor = "+provider;
+		}else if(sector !== ''  && provider !== '' && customer !== ''){
+			console.log("entro 3");
+			texto =  $("#listSectorG option:selected").text()+" - "+$("#listProviderG option:selected").text()+" - "+$("#listCustomerG option:selected").text();
+			sectorFilter = " AND s.idSector = "+sector;
+			providerFilter =  " AND p.idProveedor = "+provider;
+			customerFilter = " AND r.idCliente = "+customer;
 		}
 		
-		drawElementsMain.getInventarioGeneral(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer, null);
-		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, "AND p.idProveedor = "+provider);
-		drawElementsMain.getTipoDeSitio(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer);		
-		drawElementsMain.getFallaTiempoSolucion(sector, drawElementsMain.dateFrom, drawElementsMain.dateTo);
-		drawElementsMain.getFallaTiempoSolucionTelmex("AND s.idSector = "+sector, null, drawElementsMain.dateFrom, drawElementsMain.dateTo);
-		drawElementsMain.getIndiceFallaWan(drawElementsMain.dateFrom, drawElementsMain.dateTo, provider, sector);		
-		drawElementsMain.getFallaTiempoSolucionTelmexComparativo(drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		console.log(sectorFilter);
+		console.log(providerFilter);
+		console.log(customerFilter);
 		
+		$("#titleCumplimientoSLA").html("Cumplimiento de SLA Por Sitios: "+texto);
+		$("#fallasTiempoSolucion").html("Cantidad de Fallas por Tiempo de Soluci&oacute;n: "+texto);
+		$("#infServAdminTipoServicio").html("Informaci&oacute;n De Servicios Administrados Tipo de Servicio: "+texto);
+		
+		drawElementsMain.getInventarioGeneral(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer, null);
+		drawElementsMain.getCumplimientoSla(drawElementsMain.dateFrom, drawElementsMain.dateTo, providerFilter, sectorFilter, customerFilter);
+		drawElementsMain.getFallaTiempoSolucion(drawElementsMain.dateFrom, drawElementsMain.dateTo, providerFilter, sectorFilter, customerFilter);
+		
+		drawElementsMain.getTipoDeSitio(drawElementsMain.dateFrom, drawElementsMain.dateTo, sector, provider, customer);				
+		drawElementsMain.getFallaTiempoSolucionTelmex(sectorFilter, null, drawElementsMain.dateFrom, drawElementsMain.dateTo);
+		drawElementsMain.getIndiceFallaWan(drawElementsMain.dateFrom, drawElementsMain.dateTo, provider, sector);		
+
 		drawElementsMain.getFallaPie("#fallaResponsableG","#fallaResponsable",  "Fallas ", "Por Responsable: "+texto, sector, customer);
 		
 	},getFallaPie:function(divContainer, divElement, title, subtitle, sector, cliente){
@@ -82,16 +122,14 @@ var drawElementsMain = {
 			invokeUrl : endpoint.getFallasPie,
 			params : {"mes":drawElementsMain.dateTo, "sector":sector, "cliente":cliente},
 			callback : function(response, divContainers, divElements) {
-				
-				console.log(response);
-				
+
 				var series = [];
 			
 				series.push({name:"ADSL", y:parseInt(response.records.record.adsl)});
 				series.push({name:"CLIENTE", y:parseInt(response.records.record.cliente)});
-				series.push({name:"ISDN", y:parseInt(response.records.record.isdn)});
+				//series.push({name:"ISDN", y:parseInt(response.records.record.isdn)});
 				series.push({name:"RED UNO", y:parseInt(response.records.record.red_uno)});
-				series.push({name:"SIN CLIENTE", y:parseInt(response.records.record.sin_cliente)});
+				//series.push({name:"SIN CLIENTE", y:parseInt(response.records.record.sin_cliente)});
 				series.push({name:"TELMEX", y:parseInt(response.records.record.telmex)});
 				series.push({name:"UNINET", y:parseInt(response.records.record.uninet)});
 				
@@ -186,7 +224,6 @@ var drawElementsMain = {
 						}).change(function(){
 							//var sector = $("#listSectorG option:selected").val();
 							var divisional = $("#listDivisionalG option:selected").val();
-							console.log(drawElementsMain.dateFrom+ "-- "+drawElementsMain.dateTo);
 							drawElementsMain.getFallaTiempoSolucionTelmex(null, "AND s.idSector = "+divisional , drawElementsMain.dateFrom, drawElementsMain.dateTo);
 						});
 					}else{
@@ -338,13 +375,13 @@ var drawElementsMain = {
 	 * @param : dateTo
 	 * @param : provider
 	 */
-	, getCumplimientoSla: function(dateFrom, dateTo, provider){
+	, getCumplimientoSla: function(dateFrom, dateTo, provider, sector, customer){
 
 		$("#cumplimientoSla").empty();
 
 		cnocFramework.invokeMashup({
 			invokeUrl : endpoint.getCumplimientoSLA,
-			params : {"idProveedor": provider, "mesInicio": dateFrom, "mesFin":dateTo},
+			params : {"idProveedor": provider, "idSector": sector, "idCliente": customer, "mesInicio": dateFrom, "mesFin":dateTo},
 			callback : function(response, divContainers, divElements) {
 
 				var dentroSla = [];
@@ -377,12 +414,12 @@ var drawElementsMain = {
 	 * @param : dateTo
 	 * @param : sector
 	 */
-	getFallaTiempoSolucion: function(sector, dateFrom, dateTo){
+	getFallaTiempoSolucion: function(dateFrom, dateTo, sector, provider, sector, customer){
 		$("#fallaTiempoSolucion").empty();
 		
 		cnocFramework.invokeMashup({
 			invokeUrl : endpoint.getFallaTiempoSolucion,
-			params : {"idSector" : sector, "mesInicio": dateFrom, "mesFin":dateTo},
+			params : {"idProveedor": provider, "idSector": sector, "idCliente": customer, "mesInicio": dateFrom, "mesFin":dateTo},
 			callback : function(response, divContainers, divElements) {
 				
 				var minor3_6_hr = [];
@@ -466,10 +503,6 @@ var drawElementsMain = {
 						}
 					}					
 				}
-				
-				console.log("getFallaTiempoSolucionTelmex");
-				console.log(dataTime);
-				
 				dataChart.push({ name:"Menor a 3.6 HRS", data: minor3_6_hr});
 				dataChart.push({ name:"Entre 3.6 y 7.2 HRS", data: in_7_2hrs});
 				dataChart.push({ name:"Mayor a 7.2", data: max7_2h_r});
@@ -528,16 +561,11 @@ var drawElementsMain = {
 				
 				var valTmp = 0;
 				if(flag === 1){
-					console.log("entro 1");
 					valTmp = parseFloat(series[i].rango1);
 				}else if(flag === 2){
-					console.log("entro 2");
 					valTmp = parseFloat(series[i].rango2);
 				}else if(flag === 3){
-					console.log("entro 3");
 					valTmp = parseFloat(series[i].rango3);
-				}else {
-					console.log("No entro a nada");
 				}
 				
 				if(parseInt(series[i].iddivisional) === 1 ){
@@ -563,9 +591,7 @@ var drawElementsMain = {
 		dataChart.push({ name:"Sur", data: sur});
 		dataChart.push({ name:"Telnor", data: telnor});
 		dataChart.push({ name:"Internacional", data: internacional});
-		
-		console.log(dataChart);
-		
+
 		cnocFramework.createColumnChartComparativo(container, dataChart, dataTime, null, null);
 
 	},
@@ -629,7 +655,7 @@ var drawElementsMain = {
 			divElements : [ $("#indiceFallasWan")]
 		});
 	},
-	/* getCumplimientoSla
+	/* getSlaRegion
 	 * @param : dateFrom
 	 * @param : dateTo
 	 */
