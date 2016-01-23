@@ -28,8 +28,11 @@ var drawElementsMain = {
 		
 		var dateTmp = ((new Date().getTime() / 1000 | 0)-(365 * 24 * 3600));
 		drawElementsMain.dateFrom = new Date(dateTmp * 1000).getFullYear()+"-"+(new Date(dateTmp * 1000).getMonth()+1)+"-01";
-		drawElementsMain.dateTo = new Date().getFullYear()+"-"+(new Date().getMonth()-1)+"-01";
+		drawElementsMain.dateTo = new Date().getFullYear()+"-0"+(new Date().getMonth()+1)+"-01";
 		
+		console.log("Fecha");
+		console.log(new Date().getMonth());
+		console.log(drawElementsMain.dateTo);
 		drawElementsMain.getDataGlobal();
 		
 		
@@ -117,12 +120,15 @@ var drawElementsMain = {
 	},getFallaPie:function(divContainer, divElement, title, subtitle, sector, cliente){
 		
 		$(divElement).empty();
-		
+		console.log("drawElementsMain.dateTo");
+		console.log(drawElementsMain.dateTo);
 		cnocFramework.invokeMashup({
 			invokeUrl : endpoint.getFallasPie,
 			params : {"mes":drawElementsMain.dateTo, "sector":sector, "cliente":cliente},
 			callback : function(response, divContainers, divElements) {
-
+				
+				console.log("Response");
+				console.log(response);
 				var series = [];
 			
 				series.push({name:"ADSL", y:parseInt(response.records.record.adsl)});
